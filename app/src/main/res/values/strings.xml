@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">FraktonTask</string>
+    <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="register">Register</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="or">OR</string>
+    <string name="map">Map</string>
+    <string name="logout">Logout</string>
 </resources>

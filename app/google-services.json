@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1044166052648",
+    "project_id": "fraktontask",
+    "storage_bucket": "fraktontask.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044166052648:android:9c6194bc02ea5247c01e1d",
+        "android_client_info": {
+          "package_name": "com.liridon.fraktontask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044166052648-qtf1u07e6ta8ckr919oau79hgusas0gt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXkmBVLjJier9R65RBMH-tUD75XB5oe_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044166052648-qtf1u07e6ta8ckr919oau79hgusas0gt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

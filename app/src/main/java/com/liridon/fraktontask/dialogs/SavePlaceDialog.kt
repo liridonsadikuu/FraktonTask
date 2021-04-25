@@ -4,8 +4,10 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import android.view.Window
 import com.liridon.fraktontask.R
+import com.liridon.fraktontask.events.InitTakePhotoEvent
 import com.liridon.fraktontask.events.OpenFragmentEvent
 import com.liridon.fraktontask.events.PlaceEvent
 import com.liridon.fraktontask.fragments.FavouritePlacesFragment
@@ -13,7 +15,7 @@ import kotlinx.android.synthetic.main.dialog_save_place.*
 import org.greenrobot.eventbus.EventBus
 
 
-class SavePlaceDialog(context: Context,var latitude: Double,var longitude: Double): Dialog(context) {
+class SavePlaceDialog(context: Context): Dialog(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,19 +27,19 @@ class SavePlaceDialog(context: Context,var latitude: Double,var longitude: Doubl
     }
 
     private fun onClickListeners() {
-        btn_cancel.setOnClickListener {
+        btnNo.setOnClickListener {
             dismiss()
         }
 
-        btn_save.setOnClickListener {
+        btn_yes.setOnClickListener {
+            optionsLinearLayout.visibility = View.GONE
+            btn_take_photo.visibility = View.VISIBLE
+        }
 
-            EventBus.getDefault().post(OpenFragmentEvent(FavouritePlacesFragment()))
 
-            Handler().postDelayed({
-                EventBus.getDefault().post(PlaceEvent(latitude,longitude))
-            }, 1000)
-             dismiss()
-
+        btn_take_photo.setOnClickListener {
+            EventBus.getDefault().post(InitTakePhotoEvent())
+            dismiss()
         }
 
     }

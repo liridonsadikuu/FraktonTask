@@ -82,10 +82,18 @@ class MainActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(event: OpenFragmentEvent){
-        tvFavPlaces.callOnClick()
+        if (event.fragment is FavouritePlacesFragment) {
+            tvFavPlaces.callOnClick()
+        }else{
+            tvMap.callOnClick()
+        }
 
 
     }
+
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//    }
 
 
 

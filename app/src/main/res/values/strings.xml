@@ -15,4 +15,7 @@
     <string name="do_you_want_to_save_this_place_to_favourites_places">Do you want to save this place to favourites places?</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 </resources>

@@ -16,10 +16,24 @@
         android:textSize="18sp"
         android:textColor="@color/purple_700" />
 
-    <LinearLayout
+    <Button
+        android:visibility="gone"
+        android:id="@+id/btn_take_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_dialog_message"
+        android:layout_marginEnd="5dp"
+        android:layout_weight="0.5"
+        android:layout_marginTop="20dp"
+        android:text="@string/take_photo"
+        android:layout_below="@id/tv_dialog_message"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:id="@+id/optionsLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_take_photo"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="30dp"
@@ -28,24 +42,24 @@
         android:weightSum="1">
 
         <Button
-            android:id="@+id/btn_cancel"
+            android:id="@+id/btnNo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_weight="0.5"
-            android:text="@string/cancel"
+            android:text="@string/no"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
 
         <Button
-            android:id="@+id/btn_save"
+            android:id="@+id/btn_yes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_weight="0.5"
             android:textColor="@color/colorWhite"
-            android:text="@string/save"
+            android:text="@string/yes"
             android:textSize="12sp" />
 
     </LinearLayout>

@@ -1,31 +1,38 @@
 package com.liridon.fraktontask
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.liridon.fraktontask.authentication.LoginActivity
+import com.liridon.fraktontask.events.OpenFragmentEvent
+import com.liridon.fraktontask.fragments.FavouritePlacesFragment
+import com.liridon.fraktontask.fragments.MapFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+
+class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
-    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkIfUserIsLoggedIn()
         onClickListeners()
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        openFragment(MapFragment())
+
+    }
+
+    private fun openFragment(fragment: Fragment) {
+        val manager = supportFragmentManager
+        val transaction = manager.beginTransaction()
+        transaction.replace(R.id.fragmentHolder, fragment)
+        transaction.commit()
     }
 
     private fun onClickListeners() {
@@ -35,6 +42,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
             finish()
         }
+
+        tvMap.setOnClickListener {
+            openFragment(MapFragment())
+            mapIndicator.visibility = View.VISIBLE
+            favPlacesIndicator.visibility = View.INVISIBLE
+        }
+
+        tvFavPlaces.setOnClickListener {
+            openFragment(FavouritePlacesFragment())
+            mapIndicator.visibility = View.INVISIBLE
+            favPlacesIndicator.visibility = View.VISIBLE
+        }
+
+
     }
 
     private fun checkIfUserIsLoggedIn() {
@@ -43,22 +64,30 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
-        }else{
-            Toast.makeText(this, "Already logged in", Toast.LENGTH_LONG).show()
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap?) {
-        if (googleMap != null) {
-            mMap = googleMap
-        }
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(
-            MarkerOptions()
-            .position(sydney)
-            .title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
+
+    override fun onStop() {
+        super.onStop()
+        EventBus.getDefault().unregister(this)
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(event: OpenFragmentEvent){
+        tvFavPlaces.callOnClick()
+
+
+    }
+
+
+
+
 }

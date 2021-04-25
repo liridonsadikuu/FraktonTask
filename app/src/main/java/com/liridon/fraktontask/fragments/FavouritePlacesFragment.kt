@@ -1,16 +1,22 @@
 package com.liridon.fraktontask.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.liridon.fraktontask.Place
+import androidx.room.Room
+import com.liridon.db.PlaceDatabase
 import com.liridon.fraktontask.R
 import com.liridon.fraktontask.adapters.FavPlacesAdapter
 import com.liridon.fraktontask.events.PlaceEvent
+import com.liridon.fraktontask.model.Place
 import kotlinx.android.synthetic.main.fragment_favourite_places.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -19,9 +25,9 @@ class FavouritePlacesFragment : Fragment() {
 
     private var favPlacesAdapter = FavPlacesAdapter(arrayListOf())
 
-    companion object {
-        val placesList: MutableList<Place> = mutableListOf()
-    }
+    var placesList: MutableList<Place> = mutableListOf()
+
+    lateinit var db: PlaceDatabase
 
 
     override fun onCreateView(
@@ -42,19 +48,28 @@ class FavouritePlacesFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = favPlacesAdapter
         }
-        favPlacesAdapter.setData(placesList)
 
+        db = Room.databaseBuilder(
+                    context!!,
+                    PlaceDatabase::class.java, "place_db.db").build()
 
+        GlobalScope.launch {
+            placesList = db.getPlaceDao().getAllPlaces().toMutableList()
+            withContext(Dispatchers.Main) {
+                favPlacesAdapter.setData(placesList)
+            }
+        }
     }
-
 
     @Subscribe
     fun onEvent(event: PlaceEvent){
-
-        placesList.add(Place(event.latitude,event.longitude,event.takenPhoto))
-
-        favPlacesAdapter.setData(placesList)
-
+        GlobalScope.launch {
+            db.getPlaceDao().insert(Place(null,event.latitude,event.longitude))
+            placesList = db.getPlaceDao().getAllPlaces().toMutableList()
+            withContext(Dispatchers.Main) {
+                favPlacesAdapter.setData(placesList)
+            }
+        }
     }
 
     override fun onStart() {
@@ -67,4 +82,5 @@ class FavouritePlacesFragment : Fragment() {
         super.onStop()
         EventBus.getDefault().unregister(this)
     }
+
 }

@@ -74,7 +74,7 @@ class FavouritePlacesFragment : Fragment() {
     @Subscribe
     fun onEvent(event: PlaceEvent){
         GlobalScope.launch {
-            db.getPlaceDao().insert(Place(null,event.latitude,event.longitude,event.takenPhoto))
+            db.getPlaceDao().upsert(Place(null,event.latitude,event.longitude,event.takenPhoto))
             placesList = db.getPlaceDao().getAllPlaces().toMutableList()
             withContext(Dispatchers.Main) {
                 favPlacesAdapter.setData(placesList)

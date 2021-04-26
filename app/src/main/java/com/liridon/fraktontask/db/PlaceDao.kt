@@ -6,11 +6,8 @@ import com.liridon.fraktontask.model.Place
 @Dao
 interface PlaceDao {
 
-    @Insert()
-    suspend fun insert(place: Place): Void
-
-    @Update
-    suspend fun update(place: Place): Void
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(place: Place): Long
 
     @Query("SELECT * FROM places")
     fun getAllPlaces(): List<Place>

@@ -14,6 +14,8 @@ import com.liridon.fraktontask.events.OpenFragmentEvent
 import com.liridon.fraktontask.fragments.FavouritePlacesFragment
 import com.liridon.fraktontask.fragments.MapFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -40,22 +42,47 @@ class MainActivity : AppCompatActivity() {
 
     private fun onClickListeners() {
         logout_text_view.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-            finish()
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Do you want to logout?")
+            builder.setIcon(android.R.drawable.ic_dialog_alert)
+            builder.setPositiveButton("Yes"){dialogInterface, which ->
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            builder.setNegativeButton("No"){dialogInterface, which ->
+                dialogInterface.dismiss()
+            }
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.setCancelable(false)
+            alertDialog.show()
         }
 
         tvMap.setOnClickListener {
             openFragment(MapFragment())
             mapIndicator.visibility = View.VISIBLE
             favPlacesIndicator.visibility = View.INVISIBLE
+            ivInfo.visibility = View.VISIBLE
+
         }
 
         tvFavPlaces.setOnClickListener {
             openFragment(FavouritePlacesFragment())
             mapIndicator.visibility = View.INVISIBLE
             favPlacesIndicator.visibility = View.VISIBLE
+            ivInfo.visibility = View.GONE
+
+        }
+        ivInfo.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("In order to save a place as a favorite just click on the map in the place you want!")
+            builder.setPositiveButton("Ok"){dialogInterface, which ->
+                dialogInterface.dismiss()
+            }
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.setCancelable(false)
+            alertDialog.show()
         }
 
     }

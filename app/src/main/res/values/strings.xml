@@ -32,7 +32,7 @@
     <!--Home !-->
     <string name="map">Map</string>
     <string name="home">Home</string>
-    <string name="do_you_want_to_save_this_place_to_favourites_places">Do you want to save this place to favourites places?</string>
+    <string name="do_you_want_to_save_this_place_to_favourites_places">Do you want to save this place as favourite?</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="take_photo">Take Photo</string>

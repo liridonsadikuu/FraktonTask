@@ -33,10 +33,11 @@ class SignUpActivity : AppCompatActivity() {
                 showToastLong(getString(R.string.fill_all_fields))
             } else{
                 progress_bar.visibility = View.VISIBLE
+                hideKeyboard()
+
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, OnCompleteListener{ task ->
                     if(task.isSuccessful){
                         progress_bar.visibility = View.GONE
-                        hideKeyboard()
                         showToast(getString(R.string.successfully_registered))
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)

@@ -34,6 +34,15 @@
             android:layout_centerVertical="true"
             />
 
+        <ImageView
+            android:id="@+id/ivInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_dialog_info"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"/>
+
     </RelativeLayout>
 
     <RelativeLayout

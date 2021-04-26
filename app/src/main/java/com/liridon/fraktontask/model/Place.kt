@@ -14,5 +14,8 @@ data class Place (
         @ColumnInfo(name = "latitude")
         var latitude: Double? = null,
         @ColumnInfo(name = "longitude")
-        var longitude: Double? = null
+        var longitude: Double? = null,
+        @ColumnInfo(name = "photo")
+        var photo: Bitmap? = null
 )
+

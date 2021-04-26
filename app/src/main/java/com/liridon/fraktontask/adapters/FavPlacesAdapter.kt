@@ -14,34 +14,34 @@ import kotlinx.android.synthetic.main.fav_places_item.view.*
 import org.greenrobot.eventbus.EventBus
 
 
-class FavPlacesAdapter(var list: ArrayList<Place>) : RecyclerView.Adapter<FavPlacesAdapter.MenuListViewHolder>() {
+class FavPlacesAdapter(var list: ArrayList<Place>) : RecyclerView.Adapter<FavPlacesAdapter.FavPlacesViewHolder>() {
 
-    fun setData(lista: List<Place>) {
+    fun setData(newList: List<Place>) {
         list.clear()
-        list.addAll(lista)
+        list.addAll(newList)
         notifyDataSetChanged()
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavPlacesViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.fav_places_item, parent, false)
-        return MenuListViewHolder(view)
+        return FavPlacesViewHolder(view)
     }
 
     override fun getItemCount() = list.size
 
-    override fun onBindViewHolder(holder: MenuListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavPlacesViewHolder, position: Int) {
 
         val item = list[position]
         holder.bind(item, position)
     }
 
-    class MenuListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class FavPlacesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: Place, position: Int) {
             itemView.tvLat.text = "Latitude: " + item.latitude.toString()
             itemView.tvLong.text = "Longitude: " + item.longitude.toString()
-           // itemView.ivPhotoTaken.setImageBitmap(item.photo)
+            itemView.ivPhotoTaken.setImageBitmap(item.photo)
 
             itemView.item_holder.setOnClickListener {
                 if (item.latitude != null && item.longitude != null) {

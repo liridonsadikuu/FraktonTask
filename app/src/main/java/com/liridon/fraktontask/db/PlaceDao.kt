@@ -1,4 +1,4 @@
-package com.liridon.db
+package com.liridon.fraktontask.db
 
 import androidx.room.*
 import com.liridon.fraktontask.model.Place

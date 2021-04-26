@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
-import com.liridon.db.PlaceDatabase
+import com.liridon.fraktontask.db.PlaceDatabase
 import com.liridon.fraktontask.R
 import com.liridon.fraktontask.adapters.FavPlacesAdapter
 import com.liridon.fraktontask.events.PlaceEvent
@@ -56,7 +56,12 @@ class FavouritePlacesFragment : Fragment() {
         GlobalScope.launch {
             placesList = db.getPlaceDao().getAllPlaces().toMutableList()
             withContext(Dispatchers.Main) {
-                favPlacesAdapter.setData(placesList)
+                if (placesList.size>0) {
+                    favPlacesAdapter.setData(placesList)
+                    tvNoPlacesSaved.visibility = View.GONE
+                }else{
+                    tvNoPlacesSaved.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -64,10 +69,11 @@ class FavouritePlacesFragment : Fragment() {
     @Subscribe
     fun onEvent(event: PlaceEvent){
         GlobalScope.launch {
-            db.getPlaceDao().insert(Place(null,event.latitude,event.longitude))
+            db.getPlaceDao().insert(Place(null,event.latitude,event.longitude,event.takenPhoto))
             placesList = db.getPlaceDao().getAllPlaces().toMutableList()
             withContext(Dispatchers.Main) {
                 favPlacesAdapter.setData(placesList)
+                tvNoPlacesSaved.visibility = View.GONE
             }
         }
     }

@@ -29,11 +29,8 @@ import org.greenrobot.eventbus.Subscribe
 class FavouritePlacesFragment : Fragment() {
 
     private var favPlacesAdapter = FavPlacesAdapter(arrayListOf())
-
     var placesList: MutableList<Place> = mutableListOf()
-
     lateinit var db: PlaceDatabase
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,15 +45,12 @@ class FavouritePlacesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         rvFavPlaces.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = favPlacesAdapter
         }
 
-        db = Room.databaseBuilder(
-                    context!!,
-                    PlaceDatabase::class.java, "place_db.db").build()
+        db = Room.databaseBuilder(context!!, PlaceDatabase::class.java, "place_db.db").build()
 
         GlobalScope.launch {
             placesList = db.getPlaceDao().getAllPlaces().toMutableList()
@@ -86,8 +80,8 @@ class FavouritePlacesFragment : Fragment() {
     @Subscribe
     fun onEvent(event: ShowAlertOnItemLongClickEvent){
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Alert")
-        builder.setMessage("Do you want to delete this item?")
+        builder.setTitle(getString(R.string.alert))
+        builder.setMessage(getString(R.string.do_you_want_to_delete_this_item))
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setPositiveButton("Yes"){dialogInterface, which ->
             favPlacesAdapter.removeItem(event.position)

@@ -1,7 +1,10 @@
 package com.liridon.fraktontask
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -54,7 +57,6 @@ class MainActivity : AppCompatActivity() {
             mapIndicator.visibility = View.INVISIBLE
             favPlacesIndicator.visibility = View.VISIBLE
         }
-
 
     }
 

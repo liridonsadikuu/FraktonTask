@@ -22,6 +22,7 @@ import androidx.browser.customtabs.CustomTabsClient.getPackageName
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.room.Room
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,11 +30,18 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.liridon.fraktontask.R
+import com.liridon.fraktontask.db.PlaceDatabase
 import com.liridon.fraktontask.dialogs.SavePlaceDialog
 import com.liridon.fraktontask.events.InitTakePhotoEvent
 import com.liridon.fraktontask.events.LocateOnMapEvent
 import com.liridon.fraktontask.events.OpenFragmentEvent
 import com.liridon.fraktontask.events.PlaceEvent
+import com.liridon.fraktontask.model.Place
+import kotlinx.android.synthetic.main.fragment_favourite_places.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.text.DecimalFormat
@@ -42,7 +50,6 @@ import java.text.DecimalFormat
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-
     private val CAMERA_REQUEST_CODE = 1
     private val PERMISSION_REQUEST_CODE_CAMERA = 2
     private val REQUEST_PERMISSION_CODE_NEVER_ASK_AGAIN_SETTING  = 3
@@ -81,15 +88,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
-        }
 
-        // Add a marker in Sydney and move the camera
-        val prishtina = LatLng(42.6629138, 21.1655028)
-        mMap.addMarker(
-                MarkerOptions()
-                        .position(prishtina)
-                        .title("Marker in Prishtina"))
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(prishtina, 8f))
+            val db = Room.databaseBuilder(context!!, PlaceDatabase::class.java, "place_db.db").build()
+
+            GlobalScope.launch {
+                var placesList: MutableList<Place> = db.getPlaceDao().getAllPlaces().toMutableList()
+                withContext(Dispatchers.Main) {
+                    for(i in placesList.indices){
+                        mMap.addMarker(
+                                MarkerOptions()
+                                        .position(LatLng(placesList.get(i).latitude!!, placesList.get(i).longitude!!)))
+                    }
+                }
+            }
+        }
     }
 
     @Subscribe
@@ -99,7 +111,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             try {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
             } catch (e: ActivityNotFoundException) {
-                Toast.makeText(context,"Can not open camera!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,getString(R.string.can_not_open_camera), Toast.LENGTH_SHORT).show()
             }
         } else {
             requestPermission();
@@ -128,7 +140,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             try {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
             } catch (e: ActivityNotFoundException) {
-                Toast.makeText(context,"Can not open camera!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,getString(R.string.can_not_open_camera), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -168,7 +180,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 try {
                     startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
                 } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(context,"Can not open camera!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,getString(R.string.can_not_open_camera), Toast.LENGTH_SHORT).show()
                 }
 
             } else {
@@ -177,8 +189,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                         if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.CAMERA)) {
                             val builder = AlertDialog.Builder(context)
-                            builder.setTitle("Warning")
-                            builder.setMessage("You need to allow camera permission in order to take photo!")
+                            builder.setTitle(getString(R.string.warning))
+                            builder.setMessage(getString(R.string.permission_denied_message))
                             builder.setIcon(android.R.drawable.ic_dialog_alert)
                             builder.setPositiveButton("Ok"){dialogInterface, which ->
                                 requestPermission()
@@ -189,10 +201,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                         }else{
                             val builder = AlertDialog.Builder(context)
-                            builder.setTitle("Warning")
-                            builder.setMessage("You have disabled camera permission, please go to app settings in order to allow ")
+                            builder.setTitle(getString(R.string.warning))
+                            builder.setMessage(getString(R.string.permission_denied_dont_ask_again_message))
                             builder.setIcon(android.R.drawable.ic_dialog_alert)
-                            builder.setPositiveButton("Open app settings"){dialogInterface, which ->
+                            builder.setPositiveButton(getString(R.string.open_app_settings)){ dialogInterface, which ->
                                 val intent =
                                     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                 val uri: Uri = Uri.fromParts("package", activity!!.getPackageName(), null)

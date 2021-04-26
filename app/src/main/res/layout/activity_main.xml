@@ -22,7 +22,7 @@
             android:layout_centerInParent="true"
             android:textColor="@color/colorWhite"
             android:padding="@dimen/space_10dp"
-            android:textSize="@dimen/text_size_24sp"/>
+            android:textSize="@dimen/text_size_20sp"/>
 
         <TextView
             android:id="@+id/logout_text_view"
@@ -30,9 +30,9 @@
             android:layout_height="wrap_content"
             android:text="@string/logout"
             android:textColor="@color/colorWhite"
-            android:padding="@dimen/space_10dp"
+            android:padding="@dimen/space_20dp"
             android:layout_centerVertical="true"
-            android:textSize="@dimen/text_size_20sp"/>
+            />
 
     </RelativeLayout>
 

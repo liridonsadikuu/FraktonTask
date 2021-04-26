@@ -1,15 +1,18 @@
 package com.liridon.fraktontask.adapters
 
+import android.app.AlertDialog
+import android.content.Context
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.liridon.fraktontask.model.Place
 import com.liridon.fraktontask.R
 import com.liridon.fraktontask.events.LocateOnMapEvent
 import com.liridon.fraktontask.events.OpenFragmentEvent
+import com.liridon.fraktontask.events.ShowAlertOnItemLongClickEvent
 import com.liridon.fraktontask.fragments.MapFragment
+import com.liridon.fraktontask.model.Place
 import kotlinx.android.synthetic.main.fav_places_item.view.*
 import org.greenrobot.eventbus.EventBus
 
@@ -31,6 +34,11 @@ class FavPlacesAdapter(var list: ArrayList<Place>) : RecyclerView.Adapter<FavPla
 
     override fun getItemCount() = list.size
 
+    fun removeItem(position: Int) {
+        list.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: FavPlacesViewHolder, position: Int) {
 
         val item = list[position]
@@ -50,6 +58,11 @@ class FavPlacesAdapter(var list: ArrayList<Place>) : RecyclerView.Adapter<FavPla
                         EventBus.getDefault().post(LocateOnMapEvent(item.latitude!!, item.longitude!!))
                     }, 300)
                 }
+            }
+
+            itemView.item_holder.setOnLongClickListener() {
+                EventBus.getDefault().post(ShowAlertOnItemLongClickEvent(item,position))
+                true
             }
 
         }

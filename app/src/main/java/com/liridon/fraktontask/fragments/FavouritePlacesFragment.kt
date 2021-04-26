@@ -1,6 +1,10 @@
 package com.liridon.fraktontask.fragments
 
+import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +15,7 @@ import com.liridon.fraktontask.db.PlaceDatabase
 import com.liridon.fraktontask.R
 import com.liridon.fraktontask.adapters.FavPlacesAdapter
 import com.liridon.fraktontask.events.PlaceEvent
+import com.liridon.fraktontask.events.ShowAlertOnItemLongClickEvent
 import com.liridon.fraktontask.model.Place
 import kotlinx.android.synthetic.main.fragment_favourite_places.*
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +81,28 @@ class FavouritePlacesFragment : Fragment() {
                 tvNoPlacesSaved.visibility = View.GONE
             }
         }
+    }
+
+    @Subscribe
+    fun onEvent(event: ShowAlertOnItemLongClickEvent){
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Alert")
+        builder.setMessage("Do you want to delete this item?")
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+        builder.setPositiveButton("Yes"){dialogInterface, which ->
+            favPlacesAdapter.removeItem(event.position)
+
+            GlobalScope.launch {
+                placesList = db.getPlaceDao().getAllPlaces().toMutableList()
+                db.getPlaceDao().deletePlace(placesList.get(event.position))
+            }
+        }
+        builder.setNegativeButton("No"){dialogInterface, which ->
+            dialogInterface.dismiss()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        alertDialog.show()
     }
 
     override fun onStart() {

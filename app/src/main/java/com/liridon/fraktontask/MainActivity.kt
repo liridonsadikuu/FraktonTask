@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClickListeners() {
-        logout_text_view.setOnClickListener {
+        tvLogout.setOnClickListener {
             val builder = AlertDialog.Builder(this)
             builder.setMessage(getString(R.string.do_you_want_to_logout))
             builder.setIcon(android.R.drawable.ic_dialog_alert)

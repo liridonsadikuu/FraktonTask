@@ -36,5 +36,7 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="take_photo">Take Photo</string>
+    <string name="do_you_want_to_logout">Do you want to logout?</string>
+    <string name="info_message">In order to save a place as a favorite just click on the map in the place you want!</string>
 
 </resources>

@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         checkIfUserIsLoggedIn()
         onClickListeners()
         openFragment(MapFragment())
-
     }
 
     private fun openFragment(fragment: Fragment) {
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private fun onClickListeners() {
         logout_text_view.setOnClickListener {
             val builder = AlertDialog.Builder(this)
-            builder.setMessage("Do you want to logout?")
+            builder.setMessage(getString(R.string.do_you_want_to_logout))
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setPositiveButton("Yes"){dialogInterface, which ->
                 FirebaseAuth.getInstance().signOut()
@@ -76,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
         ivInfo.setOnClickListener {
             val builder = AlertDialog.Builder(this)
-            builder.setMessage("In order to save a place as a favorite just click on the map in the place you want!")
+            builder.setMessage(getString(R.string.info_message))
             builder.setPositiveButton("Ok"){dialogInterface, which ->
                 dialogInterface.dismiss()
             }

@@ -1,30 +1,31 @@
 package com.liridon.fraktontask.fragments
 
 import android.Manifest
-import android.accessibilityservice.GestureDescription
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.hardware.Camera
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsClient.getPackageName
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.liridon.fraktontask.R
@@ -33,7 +34,6 @@ import com.liridon.fraktontask.events.InitTakePhotoEvent
 import com.liridon.fraktontask.events.LocateOnMapEvent
 import com.liridon.fraktontask.events.OpenFragmentEvent
 import com.liridon.fraktontask.events.PlaceEvent
-import kotlinx.android.synthetic.main.fragment_map.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.text.DecimalFormat
@@ -45,18 +45,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val CAMERA_REQUEST_CODE = 1
     private val PERMISSION_REQUEST_CODE_CAMERA = 2
+    private val REQUEST_PERMISSION_CODE_NEVER_ASK_AGAIN_SETTING  = 3
     var latitude: Double = 0.0
     var longitude: Double = 0.0
-
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,7 +61,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -72,9 +68,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             mMap = googleMap
 
             mMap.setOnMapClickListener { LatLng->
-
-
-
                 Handler(Looper.getMainLooper()).post {
                     val df = DecimalFormat()
                     df.setMaximumFractionDigits(3)
@@ -96,7 +89,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 MarkerOptions()
                         .position(prishtina)
                         .title("Marker in Prishtina"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(prishtina))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(prishtina, 8f))
     }
 
     @Subscribe
@@ -108,7 +101,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } catch (e: ActivityNotFoundException) {
                 Toast.makeText(context,"Can not open camera!", Toast.LENGTH_SHORT).show()
             }
-
         } else {
             requestPermission();
         }
@@ -117,10 +109,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     @Subscribe
     fun onEvent(event: LocateOnMapEvent){
       if (::mMap.isInitialized){
-          mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(event.latitude,event.longitude), 16f));
-          Toast.makeText(context, "Animimiii", Toast.LENGTH_SHORT).show()
-
-
+          mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(event.latitude,event.longitude), 8f))
       }
     }
 
@@ -134,6 +123,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             Handler().postDelayed({
                 EventBus.getDefault().post(PlaceEvent(latitude,longitude,imageBitmap))
             }, 300)
+        }else if (requestCode == REQUEST_PERMISSION_CODE_NEVER_ASK_AGAIN_SETTING){
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            try {
+                startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(context,"Can not open camera!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -167,7 +163,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         when (requestCode) {
             PERMISSION_REQUEST_CODE_CAMERA -> if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
 
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 try {
@@ -177,19 +172,39 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
 
             } else {
-                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//                            != PackageManager.PERMISSION_GRANTED) {
-//                        showMessageOKCancel("You need to allow access permissions",
-//                                object : View.OnClickListener() {
-//                                    fun onClick(dialog: DialogInterface?, which: Int) {
-//                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                                            requestPermission()
-//                                        }
-//                                    }
-//                                })
-//                    }
+                    if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.CAMERA)) {
+                            val builder = AlertDialog.Builder(context)
+                            builder.setTitle("Warning")
+                            builder.setMessage("You need to allow camera permission in order to take photo!")
+                            builder.setIcon(android.R.drawable.ic_dialog_alert)
+                            builder.setPositiveButton("Ok"){dialogInterface, which ->
+                                requestPermission()
+                            }
+                            val alertDialog: AlertDialog = builder.create()
+                            alertDialog.setCancelable(false)
+                            alertDialog.show()
+
+                        }else{
+                            val builder = AlertDialog.Builder(context)
+                            builder.setTitle("Warning")
+                            builder.setMessage("You have disabled camera permission, please go to app settings in order to allow ")
+                            builder.setIcon(android.R.drawable.ic_dialog_alert)
+                            builder.setPositiveButton("Open app settings"){dialogInterface, which ->
+                                val intent =
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val uri: Uri = Uri.fromParts("package", activity!!.getPackageName(), null)
+                                intent.data = uri
+                                startActivityForResult(intent, REQUEST_PERMISSION_CODE_NEVER_ASK_AGAIN_SETTING)
+                            }
+                            val alertDialog: AlertDialog = builder.create()
+                            alertDialog.setCancelable(false)
+                            alertDialog.show()
+                        }
+
+                    }
                 }
             }
         }
